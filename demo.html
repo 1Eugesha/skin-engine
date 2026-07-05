@@ -50,6 +50,12 @@
     background: var(--accent); color: #08210f; font: inherit; font-weight: 600; cursor: pointer;
   }
   button:hover { filter: brightness(1.08); }
+  .wm {
+    display: block; margin-top: 6px; line-height: 0;
+    opacity: 0.5; transition: opacity .2s;
+  }
+  .wm:hover { opacity: 1; }
+  .wm img { width: 220px; height: auto; display: block; }
 </style>
 </head>
 <body>
@@ -58,6 +64,9 @@
   <input id="nick" value="1Eugesha" placeholder="Ник игрока" spellcheck="false">
   <button id="apply">Показать</button>
 </div>
+<a class="wm" href="https://1eugesha.com" target="_blank" rel="noopener" title="1Eugesha — портфолио">
+  <img src="assets/watermark.png" alt="1Eugesha Developer">
+</a>
 
 <script src="skin-engine.anims.js?v=1"></script>
 <script src="skin-engine.js?v=1"></script>
