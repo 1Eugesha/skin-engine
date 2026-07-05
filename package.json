@@ -1,0 +1,37 @@
+{
+  "name": "skin-engine",
+  "version": "1.1.0",
+  "description": "Живой 3D-скин Minecraft для сайта: idle-анимации, интерактив, плащ с физикой, авто-slim, нейм-тег, веб-компонент <skin-viewer>. Один файл, без сборки.",
+  "author": "1Eugesha",
+  "license": "MIT",
+  "main": "skin-engine.js",
+  "module": "skin-engine.mjs",
+  "types": "skin-engine.d.ts",
+  "type": "commonjs",
+  "exports": {
+    ".": {
+      "types": "./skin-engine.d.ts",
+      "import": "./skin-engine.mjs",
+      "default": "./skin-engine.js"
+    },
+    "./anims": "./skin-engine.anims.js"
+  },
+  "files": [
+    "skin-engine.js",
+    "skin-engine.anims.js",
+    "skin-engine.mjs",
+    "skin-engine.d.ts",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/1Eugesha/skin-engine.git"
+  },
+  "homepage": "https://1eugesha.github.io/skin-engine/",
+  "keywords": ["minecraft", "skin", "3d", "viewer", "webgl", "three", "skinview3d", "web-component"],
+  "devDependencies": {
+    "playwright": "^1.61.1",
+    "sharp": "^0.35.3"
+  }
+}

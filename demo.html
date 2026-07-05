@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SkinEngine</title>
+<style>
+  @font-face {
+    font-family: "Minecraft";
+    src: url("https://cdn.jsdelivr.net/gh/South-Paw/typeface-minecraft@1.0.0/files/minecraft.woff2") format("woff2"),
+         url("https://cdn.jsdelivr.net/gh/South-Paw/typeface-minecraft@1.0.0/files/minecraft.woff") format("woff");
+    font-display: swap;
+  }
+  :root {
+    --bg: #16181c;
+    --card: #1f2228;
+    --border: #33373f;
+    --text: #eceff4;
+    --accent: #1bd96a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; display: flex; flex-direction: column; gap: 16px;
+    align-items: center; justify-content: center;
+    background: var(--bg); color: var(--text);
+    font: 15px/1.5 "Segoe UI", system-ui, sans-serif;
+  }
+  .stage {
+    position: relative; width: 360px; height: 520px;
+    border-radius: 18px; background: var(--card); border: 1px solid var(--border);
+    box-shadow: 0 24px 60px rgba(0,0,0,.45);
+    display: flex; align-items: center; justify-content: center; overflow: hidden;
+  }
+  .stage::after {
+    content: ""; position: absolute; left: 50%; bottom: 30px; width: 240px; height: 60px;
+    transform: translateX(-50%); border-radius: 50%;
+    background: radial-gradient(ellipse at center, rgba(255,255,255,.10), transparent 68%);
+    pointer-events: none;
+  }
+  canvas { display: block; cursor: grab; }
+  canvas:active { cursor: grabbing; }
+  .row { display: flex; gap: 8px; width: 360px; }
+  input {
+    flex: 1; padding: 11px 14px; border-radius: 12px; border: 1px solid var(--border);
+    background: var(--card); color: var(--text); font: inherit; outline: none; min-width: 0;
+  }
+  input:focus { border-color: var(--accent); }
+  button {
+    padding: 11px 18px; border-radius: 12px; border: 1px solid var(--accent);
+    background: var(--accent); color: #08210f; font: inherit; font-weight: 600; cursor: pointer;
+  }
+  button:hover { filter: brightness(1.08); }
+</style>
+</head>
+<body>
+<div class="stage"><canvas id="skin"></canvas></div>
+<div class="row">
+  <input id="nick" value="1Eugesha" placeholder="Ник игрока" spellcheck="false">
+  <button id="apply">Показать</button>
+</div>
+
+<script src="skin-engine.anims.js?v=1"></script>
+<script src="skin-engine.js?v=1"></script>
+<script>
+  const $ = (id) => document.getElementById(id);
+  const stage = SkinEngine.mount($("skin"), {
+    skin: "https://mc-heads.net/skin/1Eugesha",
+    nameTag: "1Eugesha",
+    width: 360, height: 520,
+  });
+
+  async function apply() {
+    const nick = $("nick").value.trim() || "1Eugesha";
+    stage.setNameTag(nick);
+    stage.setSkin(`https://mc-heads.net/skin/${encodeURIComponent(nick)}`);
+    const cape = await SkinEngine.loadCape(nick);
+    if (cape) stage.setCape(cape); else stage.clearCape();
+  }
+  $("apply").onclick = apply;
+  $("nick").addEventListener("keydown", (e) => { if (e.key === "Enter") apply(); });
+
+  stage.ready.then(() => SkinEngine.loadCape("1Eugesha")).then((c) => c && stage.setCape(c)).catch(() => {});
+</script>
+</body>
+</html>

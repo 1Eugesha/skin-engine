@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>SkinEngine — автотест</title>
+<style>
+  @font-face {
+    font-family: "Minecraft";
+    src: url("https://cdn.jsdelivr.net/gh/South-Paw/typeface-minecraft@1.0.0/files/minecraft.woff2") format("woff2");
+    font-display: swap;
+  }
+  body { margin:0; background:#101216; color:#e8e8ef; font:14px/1.4 Consolas, monospace; display:flex; }
+  #stage { position:relative; width:340px; height:470px; margin:20px; background:radial-gradient(ellipse 70% 60% at 50% 80%, rgba(80,220,120,.14), transparent 70%); border-radius:14px; }
+  canvas { display:block; }
+  #panel { flex:1; padding:24px 18px; max-width:640px; }
+  h1 { font-size:18px; margin:0 0 10px; }
+  #status { font-size:26px; font-weight:bold; color:#4be281; margin:8px 0 4px; }
+  #mode { font-size:18px; color:#7fd4ff; }
+  #clock { color:#888; }
+  #steps div { padding:2px 0; color:#666; }
+  #steps div.on { color:#8f8; }
+  #steps div.now { color:#4be281; font-weight:bold; }
+  #errors { margin-top:14px; padding:10px; background:#3a1214; border-radius:8px; color:#ff9a9a; white-space:pre-wrap; display:none; font-size:12px; }
+  #errors.has { display:block; }
+</style>
+</head>
+<body>
+<div id="stage"><canvas id="cv"></canvas></div>
+<div id="panel">
+  <h1>SkinEngine — автопрогон (<span id="ver">?</span>)</h1>
+  <div id="status">ЗАГРУЗКА…</div>
+  <div id="mode">mode: —</div>
+  <div id="clock">t = 0.0s</div>
+  <div id="steps">
+    <div id="s0">0s — mount + интро + нейм-тег</div>
+    <div id="s1">4s — walk() походка (сгиб коленей → суставы цельные)</div>
+    <div id="s2">10s — play() кастомная анимация (глубокие сгибы + наклон корпуса)</div>
+    <div id="s3">17s — setSkin() разворот со сменой скина</div>
+    <div id="s4">22s — stand() статика</div>
+    <div id="s5">25s — idle + hit()×6 (сквош-импульс + вспышка урона) → ГОТОВО</div>
+  </div>
+  <div id="errors"></div>
+</div>
+<script>
+  const errBox = document.getElementById("errors");
+  function logErr(msg) { errBox.classList.add("has"); errBox.textContent += msg + "\n"; }
+  window.onerror = (m, src, l, c) => logErr(`ERROR: ${m} @ ${String(src).split("/").pop()}:${l}:${c}`);
+  window.addEventListener("unhandledrejection", (e) => logErr("REJECTION: " + (e.reason && e.reason.message || e.reason)));
+</script>
+<script src="skin-engine.anims.js?v=1"></script>
+<script src="skin-engine.js?v=1"></script>
+<script>
+  const $ = (id) => document.getElementById(id);
+  const t0 = performance.now();
+  const clockTick = () => { $("clock").textContent = "t = " + ((performance.now() - t0) / 1000).toFixed(1) + "s"; requestAnimationFrame(clockTick); };
+  clockTick();
+  function mark(n, label) {
+    for (let i = 0; i <= 5; i++) $("s" + i).className = i < n ? "on" : i === n ? "now" : "";
+    $("status").textContent = label;
+  }
+  // кастомная анимация: глубокие сгибы локтей/коленей + наклон корпуса —
+  // проверяем, что суставы и пояс остаются цельными (заглушки работают)
+  const TEST_ANIM = {
+    loop: true, begin: 0, end: 48, ret: 0, stop: 48,
+    tracks: {
+      "rightArm.pitch": [[0, -0.4], [24, -2.5], [48, -0.4]],
+      "rightArm.bend":  [[0, -0.3], [24, -2.1], [48, -0.3]],
+      "leftArm.pitch":  [[0, -0.2], [24, -1.1], [48, -0.2]],
+      "leftArm.bend":   [[0, -0.2], [24, -1.6], [48, -0.2]],
+      "rightLeg.pitch": [[0, 0], [24, -1.1], [48, 0]],
+      "rightLeg.bend":  [[0, 0], [24, 1.5], [48, 0]],
+      "leftLeg.bend":   [[0, 0], [24, 0.8], [48, 0]],
+      "torso.pitch":    [[0, 0], [24, 0.55], [48, 0]],
+      "torso.y":        [[0, 0], [24, 2.2], [48, 0]],
+      "head.pitch":     [[0, 0], [24, -0.3], [48, 0]]
+    }
+  };
+  (async () => {
+    try {
+      $("ver").textContent = "v" + (window.SkinEngine && SkinEngine.version);
+      mark(0, "ИНТРО / IDLE");
+      const stage = SkinEngine.mount($("cv"), {
+        skin: "assets/mascot.png",
+        nameTag: "1Eugesha",
+        width: 340, height: 470,
+      });
+      const modeTick = () => { $("mode").textContent = "mode: " + stage.mode; requestAnimationFrame(modeTick); };
+      modeTick();
+      stage.on("damage", () => logNote("event: damage (вспышка)"));
+      stage.on("skinchange", () => logNote("event: skinchange (разворот пошёл)"));
+      function logNote(s) { console.log(s); $("status").textContent += " ✓"; }
+      await stage.ready;
+      const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+      await sleep(4000);
+      mark(1, "WALK — походка");
+      stage.walk();
+      await sleep(6000);
+      mark(2, "PLAY — кастомная анимация");
+      stage.play(TEST_ANIM);
+      await sleep(7000);
+      mark(3, "SET SKIN — разворот");
+      stage.setSkin("https://mc-heads.net/skin/Notch");
+      await sleep(5000);
+      mark(4, "STAND (статика)");
+      stage.stand();
+      await sleep(3000);
+      mark(5, "IDLE + HIT×6");
+      stage.idle();
+      for (let i = 0; i < 6; i++) { stage.hit(1); await sleep(180); }
+      await sleep(2500);
+      mark(6, "ГОТОВО — движок отработал без падений");
+    } catch (e) {
+      logErr("FATAL: " + (e && e.message || e));
+      $("status").textContent = "ОШИБКА";
+    }
+  })();
+</script>
+</body>
+</html>
