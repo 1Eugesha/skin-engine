@@ -859,6 +859,7 @@ const SE_DEFAULTS = {
   gestures: true,
   nameTag: null,
   nameTagHeight: 21.5,
+  pixelRatio: 0,
   interactive: true,
   xfade: 0.45,
   lookFollow: true,
@@ -898,6 +899,9 @@ class SkinStage {
     this._skinLoaded = false;
     this._imp = { energy: 0, phase: 0 };
     this._flashCd = 0;
+    this._dmgWas = false;
+    this._lookRect = null;
+    this._lookRectAt = 0;
     this.ready = this._init();
     this.ready.catch(() => {});
   }
@@ -917,7 +921,9 @@ class SkinStage {
     this.viewer.autoRotate = false;
     try {
       const dpr = typeof window !== "undefined" && window.devicePixelRatio || 1;
-      this.viewer.renderer.setPixelRatio(this.gpu === "software" ? 1 : Math.min(Math.max(dpr, 2), 2.5));
+      let pr = this.cfg.pixelRatio;
+      if (!(pr > 0)) pr = this.gpu === "software" ? 1 : Math.min(Math.max(dpr, 1.5), 2.5);
+      this.viewer.renderer.setPixelRatio(pr);
     } catch (e) {}
     try {
       const ctrl = this.viewer.controls;
@@ -1177,7 +1183,9 @@ class SkinStage {
     try {
       player.scale.set(scl * sclX, scl * sclY, scl);
     } catch (e) {}
-    applyDamageTint(player, ctx.damage || 0);
+    const dmgNow = ctx.damage || 0;
+    if (dmgNow > 0 || this._dmgWas) applyDamageTint(player, dmgNow);
+    this._dmgWas = dmgNow > 0;
     updateCape(this._capeSt, player, dt, t);
   }
   _swapSkin(url) {
@@ -1200,7 +1208,12 @@ class SkinStage {
     const mv = (e) => {
       const c = this.canvas;
       if (!c) return;
-      const r = c.getBoundingClientRect();
+      const now = performance.now();
+      let r = this._lookRect;
+      if (!r || now - this._lookRectAt > 400) {
+        r = this._lookRect = c.getBoundingClientRect();
+        this._lookRectAt = now;
+      }
       if (!r.width || !r.height) return;
       const cx = r.left + r.width / 2,
         cy = r.top + r.height * 0.28;
