@@ -186,12 +186,9 @@
 | `skin-engine.mjs` | ES-модуль-обёртка (`import SkinEngine from "skin-engine"`) |
 | `skin-engine.d.ts` | типы TypeScript |
 | `demo.html` | демо-страница (живая: https://1eugesha.github.io/skin-engine/) |
-| `skin-engine-test.html` | автопрогон всех режимов с контролем ошибок |
-| `skin-diag.html` | диагностика рига (сгибы, развёртка графа) |
-| `assets/mascot.png` | скин-маскот для демо и тестов |
 
-Запуск локально: `Запустить тест.bat` (поднимает сервер на :8010) или любой
-статический сервер.
+Запуск локально: любой статический сервер в корне проекта, например
+`npx http-server` или `py -m http.server`.
 
 ## Лицензия
 

@@ -1,3 +1,5 @@
 node_modules/
 _archive/
+_dev/
+package-lock.json
 *.log
