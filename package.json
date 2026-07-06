@@ -29,8 +29,18 @@
     "url": "https://github.com/1Eugesha/skin-engine.git"
   },
   "homepage": "https://1eugesha.github.io/skin-engine/",
-  "keywords": ["minecraft", "skin", "3d", "viewer", "webgl", "three", "skinview3d", "web-component"],
+  "keywords": [
+    "minecraft",
+    "skin",
+    "3d",
+    "viewer",
+    "webgl",
+    "three",
+    "skinview3d",
+    "web-component"
+  ],
   "devDependencies": {
+    "gifenc": "^1.0.3",
     "playwright": "^1.61.1",
     "sharp": "^0.35.3"
   }

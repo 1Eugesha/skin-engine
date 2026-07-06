@@ -6,6 +6,12 @@
 
 Автор: **1Eugesha** · Лицензия: MIT
 
+<p align="center">
+  <img src="docs/preview.gif" alt="Демо SkinEngine — живая стойка, жест и отклик на клик" width="260">
+  <br>
+  <em><a href="https://1eugesha.github.io/skin-engine/">▶ Живая демка</a></em>
+</p>
+
 ---
 
 ## Возможности
