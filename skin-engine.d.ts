@@ -32,6 +32,10 @@ export interface SkinEngineOptions {
   lights?: boolean;
   /** URL плаща */
   cape?: string;
+  /** тип модели: "auto" (по текстуре), "wide" (classic) или "slim" */
+  model?: "auto" | "wide" | "slim";
+  /** плотность рендера; 0 = авто clamp(dpr, 1.5..2.5) */
+  pixelRatio?: number;
   clickMaxEnergy?: number;
   clickEnergyPerHit?: number;
   clickDecay?: number;
@@ -51,13 +55,15 @@ export interface AnimData {
   tracks: Record<string, Array<[number, number]>>;
 }
 
-export type StageEvent = "ready" | "hit" | "damage" | "emoteend" | "skinchange" | "skin";
+export type StageEvent = "ready" | "hit" | "damage" | "emoteend" | "skinchange" | "skin" | "model";
 
 export declare class SkinStage {
   constructor(canvas: HTMLCanvasElement, opts?: SkinEngineOptions);
   readonly ready: Promise<SkinStage>;
   mode: "loading" | "idle" | "walk" | "stand" | "emote" | "disposed";
   readonly damage: number;
+  /** текущий тип модели */
+  readonly model: "wide" | "slim" | null;
   /** программный рендер (нет аппаратного ускорения) */
   readonly software: boolean;
 
@@ -67,6 +73,7 @@ export declare class SkinStage {
   play(data: AnimData): this;
   stop(): this;
   setSkin(url: string): Promise<this>;
+  setModel(type: "wide" | "slim"): this;
   setCape(url: string): this;
   clearCape(): this;
   setElytra(url: string): this;

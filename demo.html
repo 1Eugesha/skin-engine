@@ -16,6 +16,7 @@
     --card: #1f2228;
     --border: #33373f;
     --text: #eceff4;
+    --muted: #9aa0ab;
     --accent: #1bd96a;
   }
   * { box-sizing: border-box; }
@@ -50,6 +51,13 @@
     background: var(--accent); color: #08210f; font: inherit; font-weight: 600; cursor: pointer;
   }
   button:hover { filter: brightness(1.08); }
+  .seg { display: flex; gap: 8px; width: 360px; }
+  .seg button {
+    flex: 1; padding: 9px 0; border-radius: 12px; border: 1px solid var(--border);
+    background: var(--card); color: var(--muted); font-weight: 600;
+  }
+  .seg button:hover { filter: none; border-color: #4a4f58; color: var(--text); }
+  .seg button.on { border-color: var(--accent); color: var(--accent); background: rgba(27,217,106,.08); }
   .wm {
     display: block; margin-top: 6px; line-height: 0;
     opacity: 0.3; transition: opacity .2s;
@@ -63,6 +71,10 @@
 <div class="row">
   <input id="nick" value="1Eugesha" placeholder="Ник игрока" spellcheck="false">
   <button id="apply">Показать</button>
+</div>
+<div class="seg">
+  <button id="m-wide">Wide</button>
+  <button id="m-slim">Slim</button>
 </div>
 <a class="wm" href="https://1eugesha.com" target="_blank" rel="noopener" title="1Eugesha — портфолио">
   <img src="assets/watermark.png" alt="1Eugesha Developer">
@@ -78,17 +90,31 @@
     width: 360, height: 520,
   });
 
+  function syncModelButtons() {
+    const m = stage.model; // "wide" | "slim"
+    $("m-wide").classList.toggle("on", m === "wide");
+    $("m-slim").classList.toggle("on", m === "slim");
+  }
+  $("m-wide").onclick = () => { stage.setModel("wide"); syncModelButtons(); };
+  $("m-slim").onclick = () => { stage.setModel("slim"); syncModelButtons(); };
+  stage.on("model", syncModelButtons);
+  stage.on("skin", syncModelButtons);
+
   async function apply() {
     const nick = $("nick").value.trim() || "1Eugesha";
     stage.setNameTag(nick);
-    stage.setSkin(`https://mc-heads.net/skin/${encodeURIComponent(nick)}`);
+    await stage.setSkin(`https://mc-heads.net/skin/${encodeURIComponent(nick)}`);
+    syncModelButtons();
     const cape = await SkinEngine.loadCape(nick);
     if (cape) stage.setCape(cape); else stage.clearCape();
   }
   $("apply").onclick = apply;
   $("nick").addEventListener("keydown", (e) => { if (e.key === "Enter") apply(); });
 
-  stage.ready.then(() => SkinEngine.loadCape("1Eugesha")).then((c) => c && stage.setCape(c)).catch(() => {});
+  stage.ready.then(() => {
+    syncModelButtons();
+    return SkinEngine.loadCape("1Eugesha");
+  }).then((c) => c && stage.setCape(c)).catch(() => {});
 </script>
 </body>
 </html>

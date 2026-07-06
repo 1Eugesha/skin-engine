@@ -7,9 +7,7 @@
 Автор: **1Eugesha** · Лицензия: MIT
 
 <p align="center">
-  <img src="docs/preview.gif" alt="Демо SkinEngine — живая стойка, жест и отклик на клик" width="260">
-  <br>
-  <em><a href="https://1eugesha.github.io/skin-engine/">▶ Живая демка</a></em>
+  <a href="https://1eugesha.github.io/skin-engine/">▶ Живая демка</a>
 </p>
 
 ---
@@ -101,6 +99,7 @@
 | `stage.play(data)` | проиграть анимацию (JSON-треки, см. ниже) |
 | `stage.stop()` | вернуться в idle |
 | `stage.setSkin(url)` | сменить скин (разворот-эффект, авто-slim) |
+| `stage.setModel("wide"\|"slim")` | принудительно тип модели; `stage.model` — текущий |
 | `stage.setCape(url)` / `clearCape()` | плащ |
 | `stage.setElytra(url)` | элитры (крылья) из текстуры плаща |
 | `stage.setEars(url)` | уши (текстура ушей) |

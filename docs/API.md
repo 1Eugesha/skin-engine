@@ -145,6 +145,7 @@ await stage.ready; // движок готов
 | `spinDur` | `0.72` | длительность разворота, с |
 | `lights` | `true` | витринный свет: холодный rim + тёплый fill |
 | `cape` | — | URL плаща (загрузится вместе со скином) |
+| `model` | `"auto"` | тип модели: `"auto"` (по текстуре), `"wide"` или `"slim"` |
 | `pixelRatio` | `0` (авто) | плотность рендера; авто = clamp(dpr, 1.5..2.5) |
 | `clickMaxEnergy` | `5` | кликов до вспышки урона |
 | `clickEnergyPerHit` | `1` | «энергия» за один клик |
@@ -167,6 +168,7 @@ await stage.ready; // движок готов
 | `stage.play(data)` | проиграть анимацию ([формат](#формат-анимаций)); одноразовая сама вернётся в idle |
 | `stage.stop()` | синоним `idle()` |
 | `await stage.setSkin(url)` | сменить скин: разворот-эффект, авто-slim по текстуре |
+| `stage.setModel(type)` | принудительно тип модели: `"wide"` (classic) или `"slim"` (Alex) |
 | `stage.setCape(url)` | плащ (с физикой ткани) |
 | `stage.clearCape()` | убрать плащ |
 | `stage.setElytra(url)` | элитры из текстуры плаща (вместо плаща) |
@@ -181,6 +183,7 @@ await stage.ready; // движок готов
 | `stage.dispose()` | освободить WebGL-контекст и снять все обработчики |
 
 Свойства: `stage.mode` (`"idle" | "walk" | "stand" | "emote" | "loading" | "disposed"`),
+`stage.model` (`"wide" | "slim"` — текущий тип модели),
 `stage.damage` (текущий уровень вспышки 0..1), `stage.software`
 (true = программный рендер без GPU).
 

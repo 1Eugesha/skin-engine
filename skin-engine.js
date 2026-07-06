@@ -860,6 +860,7 @@ const SE_DEFAULTS = {
   nameTag: null,
   nameTagHeight: 21.5,
   pixelRatio: 0,
+  model: "auto",
   interactive: true,
   xfade: 0.45,
   lookFollow: true,
@@ -897,6 +898,7 @@ class SkinStage {
     this._lookCur = { yaw: 0, pitch: 0 };
     this._lookDetach = null;
     this._skinLoaded = false;
+    this._forcedModel = this.cfg.model === "slim" ? "slim" : this.cfg.model === "wide" || this.cfg.model === "default" || this.cfg.model === "classic" ? "default" : null;
     this._imp = { energy: 0, phase: 0 };
     this._flashCd = 0;
     this._dmgWas = false;
@@ -970,7 +972,7 @@ class SkinStage {
       this._emit("skinchange", url);
       return this;
     }
-    await this.viewer.loadSkin(url);
+    await this.viewer.loadSkin(url, this._forcedModel ? { model: this._forcedModel } : undefined);
     const p = this.viewer.playerObject;
     ensureRig(p);
     seSyncModel(p.skin);
@@ -1190,7 +1192,7 @@ class SkinStage {
   }
   _swapSkin(url) {
     try {
-      const r = this.viewer.loadSkin(url);
+      const r = this.viewer.loadSkin(url, this._forcedModel ? { model: this._forcedModel } : undefined);
       const fin = () => {
         try {
           const p = this.viewer.playerObject;
@@ -1202,6 +1204,27 @@ class SkinStage {
       };
       if (r && r.then) r.then(fin, () => {});else fin();
     } catch (e) {}
+  }
+  get model() {
+    try {
+      return this.viewer.playerObject.skin.modelType === "slim" ? "slim" : "wide";
+    } catch (e) {
+      return null;
+    }
+  }
+  setModel(type) {
+    const t = type === "slim" ? "slim" : type === "wide" || type === "default" || type === "classic" ? "default" : null;
+    this._forcedModel = t;
+    if (!this.viewer) return this;
+    try {
+      const sk = this.viewer.playerObject.skin;
+      if (t && sk.modelType !== t) {
+        sk.modelType = t;
+        seSyncModel(sk);
+      }
+    } catch (e) {}
+    this._emit("model", this.model);
+    return this;
   }
   _attachLook() {
     if (this._lookDetach) return;
